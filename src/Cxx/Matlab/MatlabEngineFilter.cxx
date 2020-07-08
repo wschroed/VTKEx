@@ -5,8 +5,7 @@
 
 int main(int argc, char *argv[])
 {
-  vtkSmartPointer<vtkMatlabEngineFilter> matlabFilter = 
-      vtkSmartPointer<vtkMatlabEngineFilter>::New();
+  vtkNew<vtkMatlabEngineFilter> matlabFilter ;
 
   return EXIT_SUCCESS;
 }
