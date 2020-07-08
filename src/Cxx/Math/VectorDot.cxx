@@ -13,19 +13,16 @@
 int main(int, char *[])
 {
   // Generate data
-  vtkSmartPointer<vtkPoints> points =
-    vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkPoints> points;
   points->InsertNextPoint(0,0,0);
   points->InsertNextPoint(1,0,0);
   points->InsertNextPoint(2,0,0);
 
-  vtkSmartPointer<vtkPolyData> polydata =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> polydata;
   polydata->SetPoints(points);
 
   // Add normals
-  vtkSmartPointer<vtkFloatArray> normals =
-    vtkSmartPointer<vtkFloatArray>::New();
+  vtkNew<vtkFloatArray> normals;
   normals->SetNumberOfComponents(3);
   normals->SetName("Normals");
 
@@ -39,8 +36,7 @@ int main(int, char *[])
   polydata->GetPointData()->SetNormals(normals);
 
   // Add vectors
-  vtkSmartPointer<vtkFloatArray> vectors =
-    vtkSmartPointer<vtkFloatArray>::New();
+  vtkNew<vtkFloatArray> vectors;
   vectors->SetNumberOfComponents(3);
   vectors->SetName("Vectors");
 
@@ -54,8 +50,7 @@ int main(int, char *[])
   polydata->GetPointData()->SetVectors(vectors);
 
   // Compute the dot products between normals and vectors
-  vtkSmartPointer<vtkVectorDot> vectorDot =
-      vtkSmartPointer<vtkVectorDot>::New();
+  vtkNew<vtkVectorDot> vectorDot;
   vectorDot->SetInputData(polydata);
   vectorDot->Update();
 

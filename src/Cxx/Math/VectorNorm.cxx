@@ -12,17 +12,14 @@
 
 int main(int, char *[])
 {
-  vtkSmartPointer<vtkPoints> points =
-    vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkPoints> points;
   points->InsertNextPoint(1,2,3);
   points->InsertNextPoint(4,5,6);
 
-  vtkSmartPointer<vtkPolyData> polydata =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> polydata;
   polydata->SetPoints(points);
 
-  vtkSmartPointer<vtkFloatArray> distances =
-    vtkSmartPointer<vtkFloatArray>::New();
+  vtkNew<vtkFloatArray> distances;
   distances->SetNumberOfComponents(3);
   distances->SetName("Distances");
 
@@ -33,8 +30,7 @@ int main(int, char *[])
 
   polydata->GetPointData()->SetVectors(distances);
 
-  vtkSmartPointer<vtkVectorNorm> vectorNorm =
-    vtkSmartPointer<vtkVectorNorm>::New();
+  vtkNew<vtkVectorNorm> vectorNorm;
   vectorNorm->SetInputData(polydata);
   vectorNorm->Update();
 

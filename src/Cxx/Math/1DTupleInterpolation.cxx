@@ -8,12 +8,12 @@
   #define M_PI 3.14159265358979323846
 #endif
 #include <ctime>
- 
+
 #include <vtkSmartPointer.h>
 #include <vtkTupleInterpolator.h>
 #include <vtkCardinalSpline.h>
 #include <vtkKochanekSpline.h>
- 
+
 #define VERBOSE(x) \
 { \
   if (Verbose) \
@@ -22,12 +22,12 @@
     std::cout.flush(); \
   }\
 }
- 
+
 // verbose flag
 bool Verbose = true;
 // CSV output flag
 bool CSVOutput = false;
- 
+
 /**
  * Print example usage information.
  **/
@@ -51,19 +51,19 @@ void PrintUsage(char *binname)
   std::cout << "  Affiliation: ---\n";
   std::cout << "\n";
 }
- 
+
 /** Runge function. **/
 double FRunge(double x)
 {
   return 1.0 / (1.0 + x * x);
 }
- 
+
 /** Sine function. **/
 double FSin(double x)
 {
   return sin(x);
 }
- 
+
 /** Execute a specific tuple interpolation method with pre-initialized tuple interpolator. **/
 bool TestInterpolation(vtkSmartPointer<vtkTupleInterpolator> tupInt, double
     tolerance, const char *csvFileName, double (*mathFunc)(double), double *x,
@@ -104,7 +104,7 @@ bool TestInterpolation(vtkSmartPointer<vtkTupleInterpolator> tupInt, double
     csvint.close();
   return ok;
 }
- 
+
 /** \brief Demonstrate base functionality of VTK-based tuple interpolation (1D).
  * Demonstrate base functionality of VTK-based tuple interpolation (1D).
  *
@@ -136,10 +136,10 @@ int main(int argc, char *argv[])
     if (std::string(argv[i]) == "-co" || std::string(argv[i]) == "--csv-output")
       CSVOutput = true;
   }
- 
+
   VERBOSE(<< "\nDemonstrating VTK-based 1-tuple interpolation capabilities.\n")
   bool ok = true;
- 
+
   VERBOSE(<< "  * Generate supporting points ... ")
   bool lok = true; // local OK
   // - SINE -
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
   {
     xs[i] = -M_PI + (double) i / (double) (N1 - 1) * (2. * M_PI);
     ys[i] = FSin(xs[i]);
- 
+
     if (CSVOutput && csv.is_open())
       csv << xs[i] << ";" << ys[i] << "\n";
   }
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
   {
     xr[i] = -5.0 + (double) i / (double) (N2 - 1) * (2. * 5.0);
     yr[i] = FRunge(xr[i]);
- 
+
     if (CSVOutput && csv.is_open())
       csv << xr[i] << ";" << yr[i] << "\n";
   }
@@ -191,27 +191,27 @@ int main(int argc, char *argv[])
     csv.close();
   ok = ok && lok;
   VERBOSE(<< (lok ? "OK" : "FAILURE") << "\n")
- 
+
   VERBOSE(<< "  * Interpolation of sine using linear method ... ")
   // initialize the tuple interpolator (1D):
-  vtkSmartPointer<vtkTupleInterpolator> tupInt = vtkSmartPointer<vtkTupleInterpolator>::New();
+  vtkNew<vtkTupleInterpolator> tupInt;
   tupInt->SetInterpolationTypeToLinear(); // linear
   tupInt->SetNumberOfComponents(1); // 1D (NOTE: set #components AFTER interpolation-type!)
   lok = TestInterpolation(tupInt, 0.04, "sin_linear_int.csv", FSin, xs, ys, N1, M_PI);
   ok = ok && lok;
   VERBOSE(<< (lok ? "OK" : "FAILURE") << "\n")
- 
+
   VERBOSE(<< "  * Interpolation of sine using cardinal spline method (open interval) ... ")
   // initialize the tuple interpolator (1D):
   tupInt->SetInterpolationTypeToSpline(); // spline (implicit reset!)
-  vtkSmartPointer<vtkCardinalSpline> cardSpline = vtkSmartPointer<vtkCardinalSpline>::New();
+  vtkNew<vtkCardinalSpline> cardSpline;
   cardSpline->SetClosed(false);
   tupInt->SetInterpolatingSpline(cardSpline);
   tupInt->SetNumberOfComponents(1); // 1D (NOTE: set #components AFTER interpolation-type!)
   lok = TestInterpolation(tupInt, 0.1, "sin_card_spline_open_int.csv", FSin, xs, ys, N1, M_PI);
   ok = ok && lok;
   VERBOSE(<< (lok ? "OK" : "FAILURE") << "\n")
- 
+
   VERBOSE(<< "  * Interpolation of sine using cardinal spline method (closed interval) ... ")
   // initialize the tuple interpolator (1D):
   tupInt->Initialize(); // reset
@@ -222,19 +222,19 @@ int main(int argc, char *argv[])
   lok = TestInterpolation(tupInt, 0.05, "sin_card_spline_closed_int.csv", FSin, xs, ys, N1, M_PI);
   ok = ok && lok;
   VERBOSE(<< (lok ? "OK" : "FAILURE") << "\n")
- 
+
   VERBOSE(<< "  * Interpolation of sine using Kochanek spline (default setup) method (open interval) ... ")
   // initialize the tuple interpolator (1D):
   tupInt->Initialize(); // reset
   tupInt->SetInterpolationTypeToSpline(); // spline
-  vtkSmartPointer<vtkKochanekSpline> kochSpline = vtkSmartPointer<vtkKochanekSpline>::New();
+  vtkNew<vtkKochanekSpline> kochSpline;
   kochSpline->SetClosed(false);
   tupInt->SetInterpolatingSpline(kochSpline);
   tupInt->SetNumberOfComponents(1); // 1D (NOTE: set #components AFTER interpolation-type!)
   lok = TestInterpolation(tupInt, 0.1, "sin_koch_spline_open_int.csv", FSin, xs, ys, N1, M_PI);
   ok = ok && lok;
   VERBOSE(<< (lok ? "OK" : "FAILURE") << "\n")
- 
+
   VERBOSE(<< "  * Interpolation of sine using Kochanek spline (default setup) method (closed interval) ... ")
   // initialize the tuple interpolator (1D):
   tupInt->Initialize(); // reset
@@ -245,8 +245,7 @@ int main(int argc, char *argv[])
   lok = TestInterpolation(tupInt, 0.06, "sin_koch_spline_closed_int.csv", FSin, xs, ys, N1, M_PI);
   ok = ok && lok;
   VERBOSE(<< (lok ? "OK" : "FAILURE") << "\n")
- 
- 
+
   VERBOSE(<< "  * Interpolation of Runge using linear method ... ")
   // initialize the tuple interpolator (1D):
   tupInt->Initialize();
@@ -255,7 +254,7 @@ int main(int argc, char *argv[])
   lok = TestInterpolation(tupInt, 0.25 /* around 0! */, "runge_linear_int.csv", FRunge, xr, yr, N2, 5.0);
   ok = ok && lok;
   VERBOSE(<< (lok ? "OK" : "FAILURE") << "\n")
- 
+
   VERBOSE(<< "  * Interpolation of Runge using cardinal spline method ... ")
   // initialize the tuple interpolator (1D):
   tupInt->SetInterpolationTypeToSpline(); // spline (implicit reset!)
@@ -265,7 +264,7 @@ int main(int argc, char *argv[])
   lok = TestInterpolation(tupInt, 0.15 /* around 0! */, "runge_card_spline_int.csv", FRunge, xr, yr, N2, 5.0);
   ok = ok && lok;
   VERBOSE(<< (lok ? "OK" : "FAILURE") << "\n")
- 
+
   VERBOSE(<< "  * Interpolation of Runge using Kochanek spline method ... ")
   // initialize the tuple interpolator (1D):
   tupInt->Initialize(); // reset
@@ -276,16 +275,13 @@ int main(int argc, char *argv[])
   lok = TestInterpolation(tupInt, 0.18 /* around 0! */, "runge_koch_spline_int.csv", FRunge, xr, yr, N2, 5.0);
   ok = ok && lok;
   VERBOSE(<< (lok ? "OK" : "FAILURE") << "\n")
- 
- 
+
+
   delete[] xs;
   delete[] ys;
   delete[] xr;
   delete[] yr;
-  cardSpline = NULL;
-  kochSpline = NULL;
-  tupInt = NULL;
- 
+
   VERBOSE(<< "Application result: ")
   if (ok)
   {

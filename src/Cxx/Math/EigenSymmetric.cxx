@@ -18,20 +18,18 @@ TReal **create_matrix ( long nrow, long ncol )
 
 /* free a TReal matrix allocated with matrix() */
 template<class TReal>
-    void free_matrix ( TReal **m )
+void free_matrix ( TReal **m )
 {
   free ( m[0] );
   delete[] m;
 }
 
-
 int main(int, char *[])
 {
-// Create this matrix
-// 1 2 3
-// 2 5 9
-// 3 9 8
-
+  // Create this matrix
+  // 1 2 3
+  // 2 5 9
+  // 3 9 8
   double **a = create_matrix<double> ( 3,3 );
   a[0][0] = 1; a[0][1] = 2;  a[0][2] = 3;
   a[1][0] = 2; a[1][1] = 5;  a[1][2] = 9;

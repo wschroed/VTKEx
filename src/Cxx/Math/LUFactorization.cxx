@@ -1,7 +1,8 @@
 #include <vtkMath.h>
 
 template<class TReal>
-TReal **create_matrix ( long nrow, long ncol ) {
+TReal **create_matrix ( long nrow, long ncol )
+{
   typedef TReal* TRealPointer;
   TReal **m = new TRealPointer[nrow];
 
@@ -14,13 +15,13 @@ TReal **create_matrix ( long nrow, long ncol ) {
   return m;
 }
 
-  /* free a TReal matrix allocated with matrix() */
-  template<class TReal>
-      void free_matrix ( TReal **m )
-  {
+/* free a TReal matrix allocated with matrix() */
+template<class TReal>
+void free_matrix ( TReal **m )
+{
   free ( m[0] );
   delete[] m;
-  }
+}
 
 void OutputMatrix(double** a)
 {
@@ -37,7 +38,6 @@ int main(int, char *[] )
   a[1][0] = 6; a[1][1] = 3;
 
   //[4 3; 6 3] should decompose to [1 0; 1.5 1] * [4 3; 0 -1.5]
-
   std::cout << "a"<< std::endl;
   OutputMatrix(a);
 

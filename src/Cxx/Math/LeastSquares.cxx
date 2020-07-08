@@ -1,10 +1,10 @@
 #include <vtkSmartPointer.h>
 #include <vtkMath.h>
 
-  /* allocate memory for an nrow x ncol matrix */
-  template<class TReal>
-      TReal **create_matrix ( long nrow, long ncol )
-  {
+/* allocate memory for an nrow x ncol matrix */
+template<class TReal>
+TReal **create_matrix ( long nrow, long ncol )
+{
   typedef TReal* TRealPointer;
   TReal **m = new TRealPointer[nrow];
 
@@ -15,21 +15,20 @@
     m[ row ] = &block[ row * ncol ];
   }
   return m;
-  }
+}
 
-  /* free a TReal matrix allocated with matrix() */
-  template<class TReal>
-      void free_matrix ( TReal **m )
-  {
+/* free a TReal matrix allocated with matrix() */
+template<class TReal>
+void free_matrix ( TReal **m )
+{
   free ( m[0] );
   delete[] m;
-  }
+}
 
 int main(int, char *[])
 {
 
   // Solve XM = Y;
-
   int numberOfSamples = 3;
   int numberOfVariables = 2;
   double **x = create_matrix<double> (numberOfSamples, numberOfVariables);
