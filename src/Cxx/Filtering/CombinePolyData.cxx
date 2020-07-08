@@ -15,22 +15,18 @@
 
 int main(int argc, char *argv[])
 {
-  vtkSmartPointer<vtkPolyData> input1 =
-    vtkSmartPointer<vtkPolyData>::New();
-  vtkSmartPointer<vtkPolyData> input2 =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> input1;
+  vtkNew<vtkPolyData> input2;
 
   if(argc == 1) //command line arguments not specified
   {
-    vtkSmartPointer<vtkSphereSource> sphereSource =
-      vtkSmartPointer<vtkSphereSource>::New();
+    vtkNew<vtkSphereSource> sphereSource;
     sphereSource->SetCenter(5,0,0);
     sphereSource->Update();
 
     input1->ShallowCopy(sphereSource->GetOutput());
 
-    vtkSmartPointer<vtkConeSource> coneSource =
-      vtkSmartPointer<vtkConeSource>::New();
+    vtkNew<vtkConeSource> coneSource;
     coneSource->Update();
 
     input2->ShallowCopy(coneSource->GetOutput());
@@ -45,51 +41,41 @@ int main(int argc, char *argv[])
     }
     std::string inputFilename1 = argv[1];
     std::string inputFilename2 = argv[2];
-    vtkSmartPointer<vtkXMLPolyDataReader> reader1 =
-      vtkSmartPointer<vtkXMLPolyDataReader>::New();
+    vtkNew<vtkXMLPolyDataReader> reader1;
     reader1->SetFileName(inputFilename1.c_str());
     reader1->Update();
     input1->ShallowCopy(reader1->GetOutput());
 
-    vtkSmartPointer<vtkXMLPolyDataReader> reader2 =
-      vtkSmartPointer<vtkXMLPolyDataReader>::New();
+    vtkNew<vtkXMLPolyDataReader> reader2;
     reader2->SetFileName(inputFilename2.c_str());
     reader2->Update();
     input2->ShallowCopy(reader2->GetOutput());
   }
 
   //Append the two meshes
-  vtkSmartPointer<vtkAppendPolyData> appendFilter =
-    vtkSmartPointer<vtkAppendPolyData>::New();
+  vtkNew<vtkAppendPolyData> appendFilter;
   appendFilter->AddInputData(input1);
   appendFilter->AddInputData(input2);
 
   // Remove any duplicate points.
-  vtkSmartPointer<vtkCleanPolyData> cleanFilter =
-    vtkSmartPointer<vtkCleanPolyData>::New();
+  vtkNew<vtkCleanPolyData> cleanFilter;
   cleanFilter->SetInputConnection(appendFilter->GetOutputPort());
   cleanFilter->Update();
 
   //Create a mapper and actor
-  vtkSmartPointer<vtkNamedColors> colors =
-    vtkSmartPointer<vtkNamedColors>::New();
+  vtkNew<vtkNamedColors> colors;
 
-  vtkSmartPointer<vtkPolyDataMapper> mapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> mapper;
   mapper->SetInputConnection(cleanFilter->GetOutputPort());
 
-  vtkSmartPointer<vtkActor> actor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> actor;
   actor->SetMapper(mapper);
 
   //Create a renderer, render window, and interactor
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer;
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   //Add the actors to the scene

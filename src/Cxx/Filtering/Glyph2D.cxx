@@ -13,53 +13,43 @@
 
 int main(int, char *[])
 {
-  vtkSmartPointer<vtkPoints> points = 
-    vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkPoints> points ;
   points->InsertNextPoint(0,0,0);
   points->InsertNextPoint(1,1,0);
   points->InsertNextPoint(2,2,0);
-  
-  vtkSmartPointer<vtkPolyData> polydata = 
-    vtkSmartPointer<vtkPolyData>::New();
+
+  vtkNew<vtkPolyData> polydata ;
   polydata->SetPoints(points);
-  
+
   // Create anything you want here, we will use a polygon for the demo.
-  vtkSmartPointer<vtkRegularPolygonSource> polygonSource = 
-      vtkSmartPointer<vtkRegularPolygonSource>::New(); //default is 6 sides
-  
-  vtkSmartPointer<vtkGlyph2D> glyph2D = 
-    vtkSmartPointer<vtkGlyph2D>::New();
+  vtkNew<vtkRegularPolygonSource> polygonSource ;
+
+  vtkNew<vtkGlyph2D> glyph2D ;
   glyph2D->SetSourceConnection(polygonSource->GetOutputPort());
   glyph2D->SetInputData(polydata);
   glyph2D->Update();
 
-  vtkSmartPointer<vtkPolyDataMapper> mapper = 
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> mapper ;
   mapper->SetInputConnection(glyph2D->GetOutputPort());
   mapper->Update();
- 
-  vtkSmartPointer<vtkActor> actor = 
-    vtkSmartPointer<vtkActor>::New();
+
+  vtkNew<vtkActor> actor ;
   actor->SetMapper(mapper);
- 
+
   // Visualize
-  vtkSmartPointer<vtkRenderer> renderer = 
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow = 
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer ;
+  vtkNew<vtkRenderWindow> renderWindow ;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = 
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor ;
   renderWindowInteractor->SetRenderWindow(renderWindow);
- 
+
   renderer->AddActor(actor);
- 
-  vtkSmartPointer<vtkInteractorStyleImage> style = 
-    vtkSmartPointer<vtkInteractorStyleImage>::New();
+
+  vtkNew<vtkInteractorStyleImage> style ;
   renderWindowInteractor->SetInteractorStyle( style );
-  
+
   renderWindow->Render();
   renderWindowInteractor->Start();
-  
+
   return EXIT_SUCCESS;
 }

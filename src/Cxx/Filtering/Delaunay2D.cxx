@@ -21,8 +21,7 @@ int main(int, char *[])
 {
   // Create a set of heighs on a grid.
   // This is often called a "terrain map".
-  vtkSmartPointer<vtkPoints> points =
-    vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkPoints> points;
 
   unsigned int GridSize = 10;
   for(unsigned int x = 0; x < GridSize; x++)
@@ -34,50 +33,39 @@ int main(int, char *[])
   }
 
   // Add the grid points to a polydata object
-  vtkSmartPointer<vtkPolyData> polydata =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> polydata;
   polydata->SetPoints(points);
 
   // Triangulate the grid points
-  vtkSmartPointer<vtkDelaunay2D> delaunay =
-  vtkSmartPointer<vtkDelaunay2D>::New();
+  vtkNew<vtkDelaunay2D> delaunay;
   delaunay->SetInputData(polydata);
 
   // Visualize
-  vtkSmartPointer<vtkNamedColors> colors =
-    vtkSmartPointer<vtkNamedColors>::New();
+  vtkNew<vtkNamedColors> colors;
 
-  vtkSmartPointer<vtkPolyDataMapper> meshMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> meshMapper;
   meshMapper->SetInputConnection(delaunay->GetOutputPort());
 
-  vtkSmartPointer<vtkActor> meshActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> meshActor;
   meshActor->SetMapper(meshMapper);
   meshActor->GetProperty()->SetColor(colors->GetColor3d("Banana").GetData());
   meshActor->GetProperty()->EdgeVisibilityOn();
 
-  vtkSmartPointer<vtkVertexGlyphFilter> glyphFilter =
-    vtkSmartPointer<vtkVertexGlyphFilter>::New();
+  vtkNew<vtkVertexGlyphFilter> glyphFilter;
   glyphFilter->SetInputData(polydata);
 
-  vtkSmartPointer<vtkPolyDataMapper> pointMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> pointMapper;
   pointMapper->SetInputConnection(glyphFilter->GetOutputPort());
 
-  vtkSmartPointer<vtkActor> pointActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> pointActor;
   pointActor->GetProperty()->SetColor(colors->GetColor3d("Tomato").GetData());
   pointActor->GetProperty()->SetPointSize(5);
   pointActor->SetMapper(pointMapper);
 
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer;
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   renderer->AddActor(meshActor);

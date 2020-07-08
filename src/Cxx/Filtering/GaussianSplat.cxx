@@ -14,51 +14,42 @@
 int main(int, char *[])
 {
   // Create points on a sphere
-  vtkSmartPointer<vtkSphereSource> sphereSource = 
-    vtkSmartPointer<vtkSphereSource>::New();
+  vtkNew<vtkSphereSource> sphereSource ;
   sphereSource->Update();
-  
-  vtkSmartPointer<vtkPolyData> polydata = 
-    vtkSmartPointer<vtkPolyData>::New();
+
+  vtkNew<vtkPolyData> polydata ;
   polydata->SetPoints(sphereSource->GetOutput()->GetPoints());
 
-  vtkSmartPointer<vtkGaussianSplatter> splatter = 
-    vtkSmartPointer<vtkGaussianSplatter>::New();
+  vtkNew<vtkGaussianSplatter> splatter ;
   splatter->SetInputData(polydata);
   splatter->SetSampleDimensions(50,50,50);
   splatter->SetRadius(0.5);
   splatter->ScalarWarpingOff();
 
-  vtkSmartPointer<vtkContourFilter> surface = 
-    vtkSmartPointer<vtkContourFilter>::New();
+  vtkNew<vtkContourFilter> surface ;
   surface->SetInputConnection(splatter->GetOutputPort());
   surface->SetValue(0,0.01);
 
   // Create a mapper and actor
-  vtkSmartPointer<vtkPolyDataMapper> mapper = 
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> mapper ;
   mapper->SetInputConnection(surface->GetOutputPort());
- 
-  vtkSmartPointer<vtkActor> actor = 
-    vtkSmartPointer<vtkActor>::New();
+
+  vtkNew<vtkActor> actor ;
   actor->SetMapper(mapper);
- 
+
   // Visualize
-  vtkSmartPointer<vtkRenderer> renderer = 
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow = 
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer ;
+  vtkNew<vtkRenderWindow> renderWindow ;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = 
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor ;
   renderWindowInteractor->SetRenderWindow(renderWindow);
- 
+
   renderer->AddActor(actor);
   renderer->SetBackground(1,1,1); // Background color white
- 
+
   renderWindow->Render();
   renderWindowInteractor->Start();
-  
+
   return EXIT_SUCCESS;
 
 }

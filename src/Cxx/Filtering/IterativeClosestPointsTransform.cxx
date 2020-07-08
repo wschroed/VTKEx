@@ -27,24 +27,20 @@ void TranslatePolyData(vtkSmartPointer<vtkPolyData> polydata);
 
 int main(int argc, char *argv[])
 {
-  vtkSmartPointer<vtkPolyData> source =
-    vtkSmartPointer<vtkPolyData>::New();
-  vtkSmartPointer<vtkPolyData> target =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> source;
+  vtkNew<vtkPolyData> target;
 
   if(argc == 3)
   {
     std::cout << "Reading data..." << std::endl;
     std::string strSource = argv[1];
     std::string strTarget = argv[2];
-    vtkSmartPointer<vtkXMLPolyDataReader> sourceReader =
-      vtkSmartPointer<vtkXMLPolyDataReader>::New();
+    vtkNew<vtkXMLPolyDataReader> sourceReader;
     sourceReader->SetFileName(strSource.c_str());
     sourceReader->Update();
     source->ShallowCopy(sourceReader->GetOutput());
 
-    vtkSmartPointer<vtkXMLPolyDataReader> targetReader =
-      vtkSmartPointer<vtkXMLPolyDataReader>::New();
+    vtkNew<vtkXMLPolyDataReader> targetReader;
     targetReader->SetFileName(strTarget.c_str());
     targetReader->Update();
     target->ShallowCopy(targetReader->GetOutput());
@@ -59,8 +55,7 @@ int main(int argc, char *argv[])
   }
 
   // Setup ICP transform
-  vtkSmartPointer<vtkIterativeClosestPointTransform> icp =
-      vtkSmartPointer<vtkIterativeClosestPointTransform>::New();
+  vtkNew<vtkIterativeClosestPointTransform> icp;
   icp->SetSource(source);
   icp->SetTarget(target);
   icp->GetLandmarkTransform()->SetModeToRigidBody();
@@ -74,8 +69,7 @@ int main(int argc, char *argv[])
   std::cout << "The resulting matrix is: " << *m << std::endl;
 
   // Transform the source points by the ICP solution
-  vtkSmartPointer<vtkTransformPolyDataFilter> icpTransformFilter =
-    vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+  vtkNew<vtkTransformPolyDataFilter> icpTransformFilter;
   icpTransformFilter->SetInputData(source);
   icpTransformFilter->SetTransform(icp);
   icpTransformFilter->Update();
@@ -88,44 +82,35 @@ int main(int argc, char *argv[])
   */
 
   // Visualize
-  vtkSmartPointer<vtkPolyDataMapper> sourceMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> sourceMapper;
   sourceMapper->SetInputData(source);
 
-  vtkSmartPointer<vtkActor> sourceActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> sourceActor;
   sourceActor->SetMapper(sourceMapper);
   sourceActor->GetProperty()->SetColor(1,0,0);
   sourceActor->GetProperty()->SetPointSize(4);
 
-  vtkSmartPointer<vtkPolyDataMapper> targetMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> targetMapper;
   targetMapper->SetInputData(target);
 
-  vtkSmartPointer<vtkActor> targetActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> targetActor;
   targetActor->SetMapper(targetMapper);
   targetActor->GetProperty()->SetColor(0,1,0);
   targetActor->GetProperty()->SetPointSize(4);
 
-  vtkSmartPointer<vtkPolyDataMapper> solutionMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> solutionMapper;
   solutionMapper->SetInputConnection(icpTransformFilter->GetOutputPort());
 
-  vtkSmartPointer<vtkActor> solutionActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> solutionActor;
   solutionActor->SetMapper(solutionMapper);
   solutionActor->GetProperty()->SetColor(0,0,1);
   solutionActor->GetProperty()->SetPointSize(3);
 
   // Create a renderer, render window, and interactor
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer;
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   // Add the actor to the scene
@@ -148,8 +133,7 @@ void CreatePolyData(vtkSmartPointer<vtkPolyData> polydata)
 {
   // This function creates a set of 4 points (the origin and a point unit distance along each axis)
 
-  vtkSmartPointer<vtkPoints> points =
-    vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkPoints> points;
 
   // Create points
   double origin[3] = {0.0, 0.0, 0.0};
@@ -161,12 +145,10 @@ void CreatePolyData(vtkSmartPointer<vtkPolyData> polydata)
   double p3[3] = {0.0, 0.0, 1.0};
   points->InsertNextPoint(p3);
 
-  vtkSmartPointer<vtkPolyData> temp =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> temp;
   temp->SetPoints(points);
 
-  vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter =
-    vtkSmartPointer<vtkVertexGlyphFilter>::New();
+  vtkNew<vtkVertexGlyphFilter> vertexFilter;
   vertexFilter->SetInputData(temp);
   vertexFilter->Update();
 
@@ -175,8 +157,7 @@ void CreatePolyData(vtkSmartPointer<vtkPolyData> polydata)
 
 void PerturbPolyData(vtkSmartPointer<vtkPolyData> polydata)
 {
-  vtkSmartPointer<vtkPoints> points =
-    vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkPoints> points;
   points->ShallowCopy(polydata->GetPoints());
 
   for(vtkIdType i = 0; i < points->GetNumberOfPoints(); i++)
@@ -210,12 +191,10 @@ void PerturbPolyData(vtkSmartPointer<vtkPolyData> polydata)
 
 void TranslatePolyData(vtkSmartPointer<vtkPolyData> polydata)
 {
-  vtkSmartPointer<vtkTransform> transform =
-    vtkSmartPointer<vtkTransform>::New();
+  vtkNew<vtkTransform> transform;
   transform->Translate(0,.3,0);
 
-  vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter =
-    vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+  vtkNew<vtkTransformPolyDataFilter> transformFilter;
   transformFilter->SetInputData(polydata);
   transformFilter->SetTransform(transform);
   transformFilter->Update();

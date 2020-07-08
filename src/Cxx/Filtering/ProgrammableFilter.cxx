@@ -19,8 +19,7 @@ void AdjustPoints(void* arguments)
 
   vtkPoints* inPts = input->data->GetPoints();
   vtkIdType numPts = inPts->GetNumberOfPoints();
-  vtkSmartPointer<vtkPoints> newPts =
-      vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkPoints> newPts;
   newPts->SetNumberOfPoints(numPts);
 
   for(vtkIdType i = 0; i < numPts/2; i++)
@@ -51,12 +50,10 @@ void AdjustPoints(void* arguments)
 int main(int, char *[])
 {
   //Create a sphere
-  vtkSmartPointer<vtkSphereSource> sphereSource =
-      vtkSmartPointer<vtkSphereSource>::New();
+  vtkNew<vtkSphereSource> sphereSource;
   sphereSource->Update();
 
-  vtkSmartPointer<vtkProgrammableFilter> programmableFilter =
-      vtkSmartPointer<vtkProgrammableFilter>::New();
+  vtkNew<vtkProgrammableFilter> programmableFilter;
   programmableFilter->SetInputConnection(sphereSource->GetOutputPort());
 
   params myParams;
@@ -67,21 +64,16 @@ int main(int, char *[])
   programmableFilter->Update();
 
   //Create a mapper and actor
-  vtkSmartPointer<vtkPolyDataMapper> mapper =
-      vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> mapper;
   mapper->SetInputConnection(programmableFilter->GetOutputPort());
-  vtkSmartPointer<vtkActor> actor =
-      vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> actor;
   actor->SetMapper(mapper);
 
   //Create a renderer, render window, and interactor
-  vtkSmartPointer<vtkRenderer> renderer =
-      vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-      vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer;
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-      vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   //Add the actor to the scene

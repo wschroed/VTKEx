@@ -18,8 +18,7 @@
 int main(int, char *[])
 {
   // Generate a 10 x 10 grid of points
-  vtkSmartPointer<vtkPoints> points =
-    vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkPoints> points;
   for(unsigned int x = 0; x < 10; x++)
   {
     for(unsigned int y = 0; y < 10; y++)
@@ -30,17 +29,14 @@ int main(int, char *[])
     }
   }
 
-  vtkSmartPointer<vtkPolyData> aPolyData =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> aPolyData;
   aPolyData->SetPoints(points);
 
   // Create a cell array to store the polygon in
-  vtkSmartPointer<vtkCellArray> aCellArray =
-    vtkSmartPointer<vtkCellArray>::New();
+  vtkNew<vtkCellArray> aCellArray;
 
   // Define a polygonal hole with a clockwise polygon
-  vtkSmartPointer<vtkPolygon> aPolygon =
-   vtkSmartPointer<vtkPolygon>::New();
+  vtkNew<vtkPolygon> aPolygon;
 
   aPolygon->GetPointIds()->InsertNextId(22);
   aPolygon->GetPointIds()->InsertNextId(23);
@@ -57,38 +53,31 @@ int main(int, char *[])
 
   // Create a polydata to store the boundary. The points must be the
   // same as the points we will triangulate.
-  vtkSmartPointer<vtkPolyData> boundary =
-   vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> boundary;
   boundary->SetPoints(aPolyData->GetPoints());
   boundary->SetPolys(aCellArray);
 
   // Triangulate the grid points
-  vtkSmartPointer<vtkDelaunay2D> delaunay =
-   vtkSmartPointer<vtkDelaunay2D>::New();
+  vtkNew<vtkDelaunay2D> delaunay;
   delaunay->SetInputData(aPolyData);
   delaunay->SetSourceData(boundary);
 
   // Visualize
-  vtkSmartPointer<vtkPolyDataMapper> meshMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> meshMapper;
   meshMapper->SetInputConnection(delaunay->GetOutputPort());
 
-  vtkSmartPointer<vtkNamedColors> colors =
-    vtkSmartPointer<vtkNamedColors>::New();
+  vtkNew<vtkNamedColors> colors;
 
-  vtkSmartPointer<vtkActor> meshActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> meshActor;
   meshActor->SetMapper(meshMapper);
   meshActor->GetProperty()->EdgeVisibilityOn();
   meshActor->GetProperty()->SetEdgeColor(colors->GetColor3d("Peacock").GetData());
   meshActor->GetProperty()->SetInterpolationToFlat();
 
-  vtkSmartPointer<vtkPolyDataMapper> boundaryMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> boundaryMapper;
   boundaryMapper->SetInputData(boundary);
 
-  vtkSmartPointer<vtkActor> boundaryActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> boundaryActor;
   boundaryActor->SetMapper(boundaryMapper);
   boundaryActor->GetProperty()->SetColor(colors->GetColor3d("Raspberry").GetData());
   boundaryActor->GetProperty()->SetLineWidth(3);
@@ -97,13 +86,10 @@ int main(int, char *[])
   boundaryActor->GetProperty()->SetRepresentationToWireframe();
 
   // Create a renderer, render window, and interactor
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer;
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   // Add the actor to the scene

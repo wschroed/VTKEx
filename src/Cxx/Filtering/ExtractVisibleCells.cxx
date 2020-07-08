@@ -30,8 +30,7 @@ public:
     // "s" for "s"elect
     if(key.compare("s") == 0)
     {
-      vtkSmartPointer<vtkHardwareSelector> selector =
-        vtkSmartPointer<vtkHardwareSelector>::New();
+      vtkNew<vtkHardwareSelector> selector;
       selector->SetRenderer(this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
       int* temp = this->Interactor->GetRenderWindow()->GetSize();
       unsigned int windowSize[4];
@@ -50,28 +49,24 @@ public:
       vtkSelection* selection = selector->Select();
       std::cout << "Selection has " << selection->GetNumberOfNodes() << " nodes." << std::endl;
 
-      vtkSmartPointer<vtkExtractSelection> extractSelection =
-        vtkSmartPointer<vtkExtractSelection>::New();
+      vtkNew<vtkExtractSelection> extractSelection;
       extractSelection->SetInputData(0, this->Data);
       extractSelection->SetInputData(1, selection);
       extractSelection->Update();
 
-      vtkSmartPointer<vtkDataSetMapper> mapper =
-        vtkSmartPointer<vtkDataSetMapper>::New();
+      vtkNew<vtkDataSetMapper> mapper;
       mapper->SetInputConnection(extractSelection->GetOutputPort());
 
-      vtkSmartPointer<vtkActor> actor =
-        vtkSmartPointer<vtkActor>::New();
+      vtkNew<vtkActor> actor;
       actor->SetMapper(mapper);
       actor->GetProperty()->SetColor(1,0,0);
       this->Renderer->AddActor(actor);
-
     }
 
     // Forward events
     vtkInteractorStyleTrackballCamera::OnKeyPress();
   }
-  
+
   vtkPolyData* Data;
   vtkRenderer* Renderer;
 
@@ -81,34 +76,27 @@ vtkStandardNewMacro(KeyPressInteractorStyle);
 int main(int , char *[])
 {
   // Create a sphere
-  vtkSmartPointer<vtkSphereSource> sphereSource =
-    vtkSmartPointer<vtkSphereSource>::New();
+  vtkNew<vtkSphereSource> sphereSource;
   sphereSource->SetCenter(0.0, 0.0, 0.0);
   sphereSource->SetRadius(5.0);
   sphereSource->Update();
 
   // Create a mapper and actor
-  vtkSmartPointer<vtkPolyDataMapper> mapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> mapper;
   mapper->SetInputConnection(sphereSource->GetOutputPort());
 
-  vtkSmartPointer<vtkActor> actor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> actor;
   actor->SetMapper(mapper);
 
   // Create a renderer, render window, and interactor
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer;
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->SetMultiSamples(0); // Turn off anti-aliasing
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
-  vtkSmartPointer<KeyPressInteractorStyle> style =
-    vtkSmartPointer<KeyPressInteractorStyle>::New();
+  vtkNew<KeyPressInteractorStyle> style;
   style->Renderer = renderer;
   renderWindowInteractor->SetInteractorStyle(style);
   style->SetCurrentRenderer(renderer);

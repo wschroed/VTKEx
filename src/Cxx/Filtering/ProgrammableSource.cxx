@@ -23,8 +23,7 @@ static void Lorenz(void *arg)
   x = 0.1;
   y = 0.1;
   z = 0.1;
-  vtkSmartPointer<vtkPoints> points =
-    vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkPoints> points;
   // Get to a stable starting point
   for (int i = 0; i < 1000; ++i)
   {
@@ -41,11 +40,9 @@ static void Lorenz(void *arg)
     points->InsertNextPoint(xx, yy, zz);
     x = xx; y = yy; z = zz;
   }
-  vtkSmartPointer<vtkPolyData> pointsPolydata =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> pointsPolydata;
   pointsPolydata->SetPoints(points);
-  vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter =
-    vtkSmartPointer<vtkVertexGlyphFilter>::New();
+  vtkNew<vtkVertexGlyphFilter> vertexFilter;
   vertexFilter->SetInputData(pointsPolydata);
   vertexFilter->Update();
   vtkProgrammableSource * ps =
@@ -56,27 +53,21 @@ static void Lorenz(void *arg)
 
 int main (int, char *[])
 {
-  vtkSmartPointer<vtkProgrammableSource> source =
-    vtkSmartPointer<vtkProgrammableSource>::New();
+  vtkNew<vtkProgrammableSource> source;
   source->SetExecuteMethod(Lorenz, source);
   source->Update();
 
-  vtkSmartPointer<vtkPolyDataMapper> mapper = 
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> mapper ;
   mapper->SetInputData(source->GetPolyDataOutput());
-  
-  vtkSmartPointer<vtkActor> actor = 
-    vtkSmartPointer<vtkActor>::New();
+
+  vtkNew<vtkActor> actor ;
   actor->SetMapper(mapper);
 
   // Setup render window, renderer, and interactor
-  vtkSmartPointer<vtkRenderer> renderer = 
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow = 
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer ;
+  vtkNew<vtkRenderWindow> renderWindow ;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = 
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor ;
   renderWindowInteractor->SetRenderWindow(renderWindow);
   renderer->AddActor(actor);
   renderer->SetBackground(.4, .5, .7);

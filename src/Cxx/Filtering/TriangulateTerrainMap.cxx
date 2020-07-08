@@ -15,8 +15,7 @@
 int main(int, char *[])
 {
   // Create points on an XY grid with random Z coordinate
-  vtkSmartPointer<vtkPoints> points =
-    vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkPoints> points;
 
   unsigned int gridSize = 10;
   for(unsigned int x = 0; x < gridSize; x++)
@@ -28,48 +27,38 @@ int main(int, char *[])
   }
 
   // Add the grid points to a polydata object
-  vtkSmartPointer<vtkPolyData> polydata =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> polydata;
   polydata->SetPoints(points);
 
-  vtkSmartPointer<vtkVertexGlyphFilter> glyphFilter =
-    vtkSmartPointer<vtkVertexGlyphFilter>::New();
+  vtkNew<vtkVertexGlyphFilter> glyphFilter;
   glyphFilter->SetInputData(polydata);
   glyphFilter->Update();
 
   // Create a mapper and actor
-  vtkSmartPointer<vtkPolyDataMapper> pointsMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> pointsMapper;
   pointsMapper->SetInputConnection(glyphFilter->GetOutputPort());
 
-  vtkSmartPointer<vtkActor> pointsActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> pointsActor;
   pointsActor->SetMapper(pointsMapper);
   pointsActor->GetProperty()->SetPointSize(3);
   pointsActor->GetProperty()->SetColor(1,0,0);
   // Triangulate the grid points
-  vtkSmartPointer<vtkDelaunay2D> delaunay =
-    vtkSmartPointer<vtkDelaunay2D>::New();
+  vtkNew<vtkDelaunay2D> delaunay;
   delaunay->SetInputData(polydata);
   delaunay->Update();
 
   // Create a mapper and actor
-  vtkSmartPointer<vtkPolyDataMapper> triangulatedMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> triangulatedMapper;
   triangulatedMapper->SetInputConnection(delaunay->GetOutputPort());
 
-  vtkSmartPointer<vtkActor> triangulatedActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> triangulatedActor;
   triangulatedActor->SetMapper(triangulatedMapper);
 
   // Create a renderer, render window, and interactor
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer;
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   // Add the actor to the scene

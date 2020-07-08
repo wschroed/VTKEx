@@ -17,100 +17,83 @@ int main(int, char *[])
   This demo creates a coordinate frame (+x, +y, +z) of vectors and a rotated,
   peturbed frame (+z, +y, -x) and aligns the rotated frame to the original as best as possible.
   */
-  
-  vtkSmartPointer<vtkPoints> sourcePoints =
-    vtkSmartPointer<vtkPoints>::New();
+
+  vtkNew<vtkPoints> sourcePoints;
   double sourcePoint1[3] = {1.0, 0.0, 0.0};
   sourcePoints->InsertNextPoint(sourcePoint1);
   double sourcePoint2[3] = {0.0, 1.0, 0.0};
   sourcePoints->InsertNextPoint(sourcePoint2);
   double sourcePoint3[3] = {0.0, 0.0, 1.0};
   sourcePoints->InsertNextPoint(sourcePoint3);
-  
-  vtkSmartPointer<vtkPoints> targetPoints =
-    vtkSmartPointer<vtkPoints>::New();
+
+  vtkNew<vtkPoints> targetPoints;
   double targetPoint1[3] = {0.0, 0.0, 1.1};
   targetPoints->InsertNextPoint(targetPoint1);
   double targetPoint2[3] = {0.0, 1.02, 0.0};
   targetPoints->InsertNextPoint(targetPoint2);
   double targetPoint3[3] = {-1.11, 0.0, 0.0};
   targetPoints->InsertNextPoint(targetPoint3);
-  
+
   // Setup the transform
-  vtkSmartPointer<vtkLandmarkTransform> landmarkTransform = 
-    vtkSmartPointer<vtkLandmarkTransform>::New();
+  vtkNew<vtkLandmarkTransform> landmarkTransform ;
   landmarkTransform->SetSourceLandmarks(sourcePoints);
   landmarkTransform->SetTargetLandmarks(targetPoints);
   landmarkTransform->SetModeToRigidBody();
   landmarkTransform->Update(); //should this be here?
 
-  vtkSmartPointer<vtkPolyData> source =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> source;
   source->SetPoints(sourcePoints);
-  
-  vtkSmartPointer<vtkPolyData> target =
-    vtkSmartPointer<vtkPolyData>::New();
+
+  vtkNew<vtkPolyData> target;
   target->SetPoints(targetPoints);
-  
-  vtkSmartPointer<vtkVertexGlyphFilter> sourceGlyphFilter =
-    vtkSmartPointer<vtkVertexGlyphFilter>::New();
+
+  vtkNew<vtkVertexGlyphFilter> sourceGlyphFilter;
   sourceGlyphFilter->SetInputData(source);
   sourceGlyphFilter->Update();
-  
-  vtkSmartPointer<vtkVertexGlyphFilter> targetGlyphFilter =
-    vtkSmartPointer<vtkVertexGlyphFilter>::New();
+
+  vtkNew<vtkVertexGlyphFilter> targetGlyphFilter;
   targetGlyphFilter->SetInputData(target);
   targetGlyphFilter->Update();
-    
-  vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter =
-    vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+
+  vtkNew<vtkTransformPolyDataFilter> transformFilter;
   transformFilter->SetInputConnection(sourceGlyphFilter->GetOutputPort());
   transformFilter->SetTransform(landmarkTransform);
   transformFilter->Update();
-    
+
   // Display the transformation matrix that was computed
   vtkMatrix4x4* mat = landmarkTransform->GetMatrix();
   std::cout << "Matrix: " << *mat << std::endl;
 
   // Visualize
-  vtkSmartPointer<vtkPolyDataMapper> sourceMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> sourceMapper;
   sourceMapper->SetInputConnection(sourceGlyphFilter->GetOutputPort());
 
-  vtkSmartPointer<vtkActor> sourceActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> sourceActor;
   sourceActor->SetMapper(sourceMapper);
   sourceActor->GetProperty()->SetColor(0,1,0);
   sourceActor->GetProperty()->SetPointSize(4);
 
-  vtkSmartPointer<vtkPolyDataMapper> targetMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> targetMapper;
   targetMapper->SetInputConnection(targetGlyphFilter->GetOutputPort());
 
-  vtkSmartPointer<vtkActor> targetActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> targetActor;
   targetActor->SetMapper(targetMapper);
   targetActor->GetProperty()->SetColor(1,0,0);
   targetActor->GetProperty()->SetPointSize(4);
-  
-  vtkSmartPointer<vtkPolyDataMapper> solutionMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+
+  vtkNew<vtkPolyDataMapper> solutionMapper;
   solutionMapper->SetInputConnection(transformFilter->GetOutputPort());
 
-  vtkSmartPointer<vtkActor> solutionActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> solutionActor;
   solutionActor->SetMapper(solutionMapper);
   solutionActor->GetProperty()->SetColor(0,0,1);
   solutionActor->GetProperty()->SetPointSize(3);
-  
+
   // Create a renderer, render window, and interactor
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer;
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   // Add the actor to the scene
@@ -122,6 +105,6 @@ int main(int, char *[])
   // Render and interact
   renderWindow->Render();
   renderWindowInteractor->Start();
-  
+
   return EXIT_SUCCESS;
 }

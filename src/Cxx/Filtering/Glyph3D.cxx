@@ -12,48 +12,39 @@
 
 int main(int, char *[])
 {
-  vtkSmartPointer<vtkPoints> points = 
-    vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkPoints> points ;
   points->InsertNextPoint(0,0,0);
   points->InsertNextPoint(1,1,1);
   points->InsertNextPoint(2,2,2);
-  vtkSmartPointer<vtkPolyData> polydata = 
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> polydata ;
   polydata->SetPoints(points);
- 
+
   // Create anything you want here, we will use a cube for the demo.
-  vtkSmartPointer<vtkCubeSource> cubeSource = 
-      vtkSmartPointer<vtkCubeSource>::New();
- 
-  vtkSmartPointer<vtkGlyph3D> glyph3D = 
-    vtkSmartPointer<vtkGlyph3D>::New();
+  vtkNew<vtkCubeSource> cubeSource ;
+
+  vtkNew<vtkGlyph3D> glyph3D ;
   glyph3D->SetSourceConnection(cubeSource->GetOutputPort());
   glyph3D->SetInputData(polydata);
   glyph3D->Update();
-    
+
   // Visualize
-  vtkSmartPointer<vtkPolyDataMapper> mapper = 
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> mapper ;
   mapper->SetInputConnection(glyph3D->GetOutputPort());
- 
-  vtkSmartPointer<vtkActor> actor = 
-    vtkSmartPointer<vtkActor>::New();
+
+  vtkNew<vtkActor> actor ;
   actor->SetMapper(mapper);
- 
-  vtkSmartPointer<vtkRenderer> renderer = 
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow = 
-    vtkSmartPointer<vtkRenderWindow>::New();
+
+  vtkNew<vtkRenderer> renderer;
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = 
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
   renderWindowInteractor->SetRenderWindow(renderWindow);
- 
+
   renderer->AddActor(actor);
   renderer->SetBackground(.3, .6, .3); // Background color green
- 
+
   renderWindow->Render();
   renderWindowInteractor->Start();
- 
+
   return EXIT_SUCCESS;
 }
