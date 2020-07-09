@@ -21,44 +21,40 @@ int main(int argc, char *argv[])
   }
 
   std::string filename = argv[1]; // "/Data/tensors.vtk";
-  
+
   std::cout << "filename: " << filename << std::endl;
 
-  vtkSmartPointer<vtkUnstructuredGridReader> reader =
-    vtkSmartPointer<vtkUnstructuredGridReader>::New();
+  vtkNew<vtkUnstructuredGridReader> reader;
   reader->SetFileName(filename.c_str());
   reader->Update();
 
-  vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter =
-    vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+  vtkNew<vtkDataSetSurfaceFilter> surfaceFilter;
   surfaceFilter->SetInputConnection(reader->GetOutputPort());
   surfaceFilter->Update();
-  
-  vtkSmartPointer<vtkMatrixMathFilter> matrixMathFilter =
-    vtkSmartPointer<vtkMatrixMathFilter>::New();
+
+  vtkNew<vtkMatrixMathFilter> matrixMathFilter;
   //matrixMathFilter->SetOperationToDeterminant();
   matrixMathFilter->SetOperationToEigenvalue();
   matrixMathFilter->SetInputConnection(surfaceFilter->GetOutputPort());
   matrixMathFilter->Update();
   matrixMathFilter->GetOutput()->GetPointData()->SetActiveScalars("Eigenvalue");
 
-  vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+  vtkNew<vtkXMLPolyDataWriter> writer;
   writer->SetInputConnection(matrixMathFilter->GetOutputPort());
   writer->SetFileName("output.vtp");
   writer->Write();
-  
+
   // Visualize
-  vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> mapper ;
   mapper->SetInputConnection(matrixMathFilter->GetOutputPort());
 
-  vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> actor;
   actor->SetMapper(mapper);
 
-  vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer;
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   renderer->AddActor(actor);

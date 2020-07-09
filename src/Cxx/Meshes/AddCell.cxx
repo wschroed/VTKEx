@@ -6,25 +6,21 @@
 int main(int , char *[])
 {
   // Create a triangle
-  vtkSmartPointer<vtkPoints> points =
-    vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkPoints> points;
   points->InsertNextPoint ( 1.0, 0.0, 0.0 );
   points->InsertNextPoint ( 0.0, 0.0, 0.0 );
   points->InsertNextPoint ( 0.0, 1.0, 0.0 );
 
-  vtkSmartPointer<vtkTriangle> triangle =
-    vtkSmartPointer<vtkTriangle>::New();
+  vtkNew<vtkTriangle> triangle;
   triangle->GetPointIds()->SetId ( 0, 0 );
   triangle->GetPointIds()->SetId ( 1, 1 );
   triangle->GetPointIds()->SetId ( 2, 2 );
 
-  vtkSmartPointer<vtkCellArray> triangles =
-    vtkSmartPointer<vtkCellArray>::New();
+  vtkNew<vtkCellArray> triangles;
   triangles->InsertNextCell ( triangle );
 
   // Create a polydata object
-  vtkSmartPointer<vtkPolyData> polyData =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> polyData;
 
   // Add the geometry and topology to the polydata
   polyData->SetPoints ( points );

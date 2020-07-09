@@ -10,12 +10,10 @@
 
 int main(int, char *[])
 {
-  vtkSmartPointer<vtkDiskSource> diskSource =
-    vtkSmartPointer<vtkDiskSource>::New();
+  vtkNew<vtkDiskSource> diskSource;
   diskSource->Update();
 
-  vtkSmartPointer<vtkFeatureEdges> featureEdges =
-    vtkSmartPointer<vtkFeatureEdges>::New();
+  vtkNew<vtkFeatureEdges> featureEdges;
   featureEdges->SetInputConnection(diskSource->GetOutputPort());
   featureEdges->BoundaryEdgesOn();
   featureEdges->FeatureEdgesOff();
@@ -24,28 +22,21 @@ int main(int, char *[])
   featureEdges->Update();
 
   // Visualize
-  vtkSmartPointer<vtkPolyDataMapper> edgeMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> edgeMapper;
   edgeMapper->SetInputConnection(featureEdges->GetOutputPort());
-  vtkSmartPointer<vtkActor> edgeActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> edgeActor;
   edgeActor->SetMapper(edgeMapper);
 
-  vtkSmartPointer<vtkPolyDataMapper> diskMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> diskMapper;
   diskMapper->SetInputConnection(diskSource->GetOutputPort());
-  vtkSmartPointer<vtkActor> diskActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> diskActor;
   diskActor->SetMapper(diskMapper);
 
   // Create a renderer, render window, and interactor
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer;
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   renderer->AddActor(edgeActor);
@@ -54,6 +45,6 @@ int main(int, char *[])
 
   renderWindow->Render();
   renderWindowInteractor->Start();
-  
+
   return EXIT_SUCCESS;
 }

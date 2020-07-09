@@ -9,12 +9,10 @@
 
 int main(int, char *[])
 {
-  vtkSmartPointer<vtkSphereSource> sphereSource =
-    vtkSmartPointer<vtkSphereSource>::New();
+  vtkNew<vtkSphereSource> sphereSource;
   sphereSource->Update();
-  
-  vtkSmartPointer<vtkWindowedSincPolyDataFilter> smoother =
-    vtkSmartPointer<vtkWindowedSincPolyDataFilter>::New();
+
+  vtkNew<vtkWindowedSincPolyDataFilter> smoother;
   smoother->SetInputConnection(sphereSource->GetOutputPort());
   smoother->SetNumberOfIterations(15);
   smoother->BoundarySmoothingOff();
@@ -25,28 +23,22 @@ int main(int, char *[])
   smoother->NormalizeCoordinatesOn();
   smoother->Update();
 
-  vtkSmartPointer<vtkPolyDataMapper> smoothedMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> smoothedMapper;
   smoothedMapper->SetInputConnection(smoother->GetOutputPort());
-  vtkSmartPointer<vtkActor> smoothedActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> smoothedActor;
   smoothedActor->SetMapper(smoothedMapper);
-  
-  vtkSmartPointer<vtkPolyDataMapper> inputMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+
+  vtkNew<vtkPolyDataMapper> inputMapper;
   inputMapper->SetInputConnection(sphereSource->GetOutputPort());
-  vtkSmartPointer<vtkActor> inputActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> inputActor;
   inputActor->SetMapper(inputMapper);
-  
+
   // There will be one render window
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->SetSize(600, 300);
 
   // And one interactor
-  vtkSmartPointer<vtkRenderWindowInteractor> interactor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> interactor;
   interactor->SetRenderWindow(renderWindow);
 
   // Define viewport ranges
@@ -55,14 +47,12 @@ int main(int, char *[])
   double rightViewport[4] = {0.5, 0.0, 1.0, 1.0};
 
   // Setup both renderers
-  vtkSmartPointer<vtkRenderer> leftRenderer =
-    vtkSmartPointer<vtkRenderer>::New();
+  vtkNew<vtkRenderer> leftRenderer;
   renderWindow->AddRenderer(leftRenderer);
   leftRenderer->SetViewport(leftViewport);
   leftRenderer->SetBackground(.6, .5, .4);
 
-  vtkSmartPointer<vtkRenderer> rightRenderer =
-    vtkSmartPointer<vtkRenderer>::New();
+  vtkNew<vtkRenderer> rightRenderer;
   renderWindow->AddRenderer(rightRenderer);
   rightRenderer->SetViewport(rightViewport);
   rightRenderer->SetBackground(.4, .5, .6);
@@ -77,6 +67,6 @@ int main(int, char *[])
 
   renderWindow->Render();
   interactor->Start();
- 
+
   return EXIT_SUCCESS;
 }

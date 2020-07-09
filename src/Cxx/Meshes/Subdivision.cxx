@@ -27,21 +27,18 @@ int main(int argc, char *argv[])
 
   if(argc > 1) //If a file name is specified, open and use the file.
   {
-    vtkSmartPointer<vtkXMLPolyDataReader> reader =
-      vtkSmartPointer<vtkXMLPolyDataReader>::New();
+    vtkNew<vtkXMLPolyDataReader> reader;
     reader->SetFileName(argv[1]);
 
     // Subdivision filters only work on triangles
-    vtkSmartPointer<vtkTriangleFilter> triangles =
-      vtkSmartPointer<vtkTriangleFilter>::New();
+    vtkNew<vtkTriangleFilter> triangles;
     triangles->SetInputConnection(reader->GetOutputPort());
     triangles->Update();
     originalMesh = triangles->GetOutput();
   }
   else //If a file name is not specified, create a sphere
   {
-    vtkSmartPointer<vtkSphereSource> sphereSource =
-      vtkSmartPointer<vtkSphereSource>::New();
+    vtkNew<vtkSphereSource> sphereSource;
     sphereSource->Update();
     originalMesh = sphereSource->GetOutput();
   }
@@ -54,12 +51,10 @@ int main(int argc, char *argv[])
 
   double numberOfViewports = 3.;
 
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->SetSize(200* numberOfViewports,200); //(width, height)
 
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-      vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
 
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
@@ -92,17 +87,15 @@ int main(int argc, char *argv[])
     subdivisionFilter->SetInputData(originalMesh);
     subdivisionFilter->Update();
 
-    vtkSmartPointer<vtkRenderer> renderer =
-      vtkSmartPointer<vtkRenderer>::New();
+    vtkNew<vtkRenderer> renderer;
 
     renderWindow->AddRenderer(renderer);
     renderer->SetViewport(static_cast<double>(i)/numberOfViewports,0,static_cast<double>(i+1)/numberOfViewports,1);
 
     //Create a mapper and actor
-    vtkSmartPointer<vtkPolyDataMapper> mapper =
-        vtkSmartPointer<vtkPolyDataMapper>::New();
+    vtkNew<vtkPolyDataMapper> mapper;
     mapper->SetInputConnection(subdivisionFilter->GetOutputPort());
-    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+    vtkNew<vtkActor> actor;
     actor->SetMapper(mapper);
     renderer->AddActor(actor);
     renderer->ResetCamera();

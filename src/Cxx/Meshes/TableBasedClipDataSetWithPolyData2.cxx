@@ -53,7 +53,7 @@ vtkSmartPointer<vtkRectilinearGrid> makeImage(int n)
   // This is a simplification of a program that uses actual image data
   // as a source for the rectilinear grid.  In order to recreate the
   // same vtk calls, create a dummy image here.
-  auto image0 = vtkSmartPointer<vtkImageData>::New();
+  vtkNew<vtkImageData> image0;
   image0->SetDimensions(n, n, n);
   image0->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
   image0->SetSpacing(CUBESIZE/n, CUBESIZE/n, CUBESIZE/n);
@@ -69,15 +69,14 @@ vtkSmartPointer<vtkRectilinearGrid> makeImage(int n)
       }
     }
   }
-  
-  auto lut = vtkSmartPointer<vtkLookupTable>::New();
+
+  vtkNew<vtkLookupTable> lut;
   lut->SetNumberOfTableValues(2);
   lut->SetTableRange(0, 1);
   lut->SetTableValue(0, IMAGE_R, IMAGE_G, IMAGE_B, IMAGE_A);
   lut->SetTableValue(1, DIM*IMAGE_R, DIM*IMAGE_G, DIM*IMAGE_B, IMAGE_A);
 
-  auto map =
-    vtkSmartPointer<vtkImageMapToColors>::New();
+  vtkNew<vtkImageMapToColors> map;
   map->SetLookupTable(lut);
   map->SetOutputFormatToRGBA();
   map->SetInputData(image0);
@@ -86,9 +85,7 @@ vtkSmartPointer<vtkRectilinearGrid> makeImage(int n)
 
   // Convert the image to a rectilinear grid.  Each point in the image
   // becomes a cubic cell in the grid.
-  
-  auto rectgrid =
-    vtkSmartPointer<vtkRectilinearGrid>::New();
+  vtkNew<vtkRectilinearGrid> rectgrid;
 
   int extent[6];
   image->GetExtent(extent);
@@ -97,12 +94,9 @@ vtkSmartPointer<vtkRectilinearGrid> makeImage(int n)
   extent[5] += 1;
   rectgrid->SetExtent(extent);
 
-  auto xcoords =
-    vtkSmartPointer<vtkDoubleArray>::New();
-  auto ycoords =
-    vtkSmartPointer<vtkDoubleArray>::New();
-  auto zcoords =
-    vtkSmartPointer<vtkDoubleArray>::New();
+  vtkNew<vtkDoubleArray> xcoords;
+  vtkNew<vtkDoubleArray> ycoords;
+  vtkNew<vtkDoubleArray> zcoords;
   xcoords->SetNumberOfValues(n+1);
   ycoords->SetNumberOfValues(n+1);
   zcoords->SetNumberOfValues(n+1);
@@ -131,31 +125,26 @@ int main(int, char *[])
 {
 
   vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
-  
-  auto colors =
-    vtkSmartPointer<vtkNamedColors>::New();
+
+  vtkNew<vtkNamedColors> colors;
   auto renderer = vtkSmartPointer<vtkRenderer>::New();
   renderer->SetBackground(colors->GetColor3d("Wheat").GetData());
   renderer->UseHiddenLineRemovalOn();
 
-  auto renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->AddRenderer(renderer);
   renderWindow->SetSize(640, 480);
 
-  auto interactor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
-  auto style =
-    vtkSmartPointer<vtkInteractorStyleSwitch>::New();
+  vtkNew<vtkRenderWindowInteractor> interactor;
+  vtkNew<vtkInteractorStyleSwitch> style;
   interactor->SetInteractorStyle(style);
   interactor->SetRenderWindow(renderWindow);
 
   vtkSmartPointer<vtkRectilinearGrid> image = makeImage(IMAGESIZE);
 
   // Clipping planes in the X and Y direction.
-  auto normals
-    = vtkSmartPointer<vtkDoubleArray>::New();
-  auto clipPts = vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkDoubleArray> normals;
+  vtkNew<vtkPoints> clipPts;
   normals->SetNumberOfComponents(3);
   double xnorm[3] = {-1., 0., 0.};
   double ynorm[3] = {0., -1., 0.};
@@ -166,18 +155,16 @@ int main(int, char *[])
   clipPts->InsertNextPoint(xpt);
   clipPts->InsertNextPoint(ypt);
 
-  auto clipPlanes = vtkSmartPointer<vtkPlanes>::New();
+  vtkNew<vtkPlanes> clipPlanes;
   clipPlanes->SetNormals(normals);
   clipPlanes->SetPoints(clipPts);
 
-  auto clipper =
-    vtkSmartPointer<vtkTableBasedClipDataSet>::New();
+  vtkNew<vtkTableBasedClipDataSet> clipper;
   clipper->SetClipFunction(clipPlanes);
   clipper->SetInputData(image);
 
-  auto imageMapper =
-    vtkSmartPointer<vtkDataSetMapper>::New();
-  auto imageActor = vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkDataSetMapper> imageMapper;
+  vtkNew<vtkActor> imageActor;
   imageActor->SetMapper(imageMapper);
   renderer->AddViewProp(imageActor);
   imageMapper->SetInputConnection(clipper->GetOutputPort());
@@ -187,7 +174,7 @@ int main(int, char *[])
   renderer->GetActiveCamera()->Elevation(30);
   renderer->ResetCameraClippingRange();
   renderWindow->Render();
-  
+
   interactor->Start();
   return EXIT_SUCCESS;
 }

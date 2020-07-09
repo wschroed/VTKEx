@@ -6,8 +6,7 @@
 
 int main(int, char *[])
 {
-  vtkSmartPointer<vtkTriangle> triangle =
-    vtkSmartPointer<vtkTriangle>::New();
+  vtkNew<vtkTriangle> triangle;
   triangle->GetPoints()->SetPoint(0, 1.0, 0.0, 0.0);
   triangle->GetPoints()->SetPoint(1, 0.0, 0.0, 0.0);
   triangle->GetPoints()->SetPoint(2, 0.0, 1.0, 0.0);
@@ -33,7 +32,6 @@ int main(int, char *[])
     }
 
   }
-
 
   return EXIT_SUCCESS;
 }

@@ -33,8 +33,7 @@ vtkSmartPointer<vtkPolyData> ReadPolyData(const char *fileName);
 
 int main(int argc, char *argv[])
 {
-  vtkSmartPointer<vtkNamedColors> namedColors =
-    vtkSmartPointer<vtkNamedColors>::New();
+  vtkNew<vtkNamedColors> namedColors;
 
   std::string filename;
   std::string extension;
@@ -52,55 +51,46 @@ int main(int argc, char *argv[])
   }
 
   // Create pipeline
-  vtkSmartPointer<vtkOBBDicer> dicer =
-  vtkSmartPointer<vtkOBBDicer>::New();
+  vtkNew<vtkOBBDicer> dicer;
   dicer->SetInputData(inputPolyData);
   dicer->SetNumberOfPieces(4);
   dicer->SetDiceModeToSpecifiedNumberOfPieces();
   dicer->Update();
 
-  vtkSmartPointer<vtkThreshold> selector =
-    vtkSmartPointer<vtkThreshold>::New();
+  vtkNew<vtkThreshold> selector;
   selector->SetInputArrayToProcess(0, 0, 0, 0, "vtkOBBDicer_GroupIds");
   selector->SetInputConnection(dicer->GetOutputPort());
   selector->AllScalarsOff();
 
   // Create graphics stuff
   //
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
+  vtkNew<vtkRenderer> renderer;
   renderer->SetBackground(namedColors->GetColor3d("NavajoWhite").GetData());
 
-  vtkSmartPointer<vtkRenderWindow> renWin =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderWindow> renWin;
   renWin->AddRenderer(renderer);
   renWin->SetSize(512, 512);
 
-  vtkSmartPointer<vtkRenderWindowInteractor> iren =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> iren;
   iren->SetRenderWindow(renWin);
 
   // Use a color series to create a transfer function
-  vtkSmartPointer<vtkColorSeries> colorSeries =
-    vtkSmartPointer<vtkColorSeries>::New();
+  vtkNew<vtkColorSeries> colorSeries;
   colorSeries->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_SPECTRAL_11);
 
   // Create an actor for each piece
   for (int i = 0; i < dicer->GetNumberOfActualPieces(); ++i)
   {
     selector->ThresholdBetween(i, i);
-    vtkSmartPointer<vtkGeometryFilter> geometry =
-      vtkSmartPointer<vtkGeometryFilter>::New();
+    vtkNew<vtkGeometryFilter> geometry;
     geometry->SetInputConnection(selector->GetOutputPort());
     geometry->Update();
 
-    vtkSmartPointer<vtkDataSetMapper> mapper =
-      vtkSmartPointer<vtkDataSetMapper>::New();
+    vtkNew<vtkDataSetMapper> mapper;
     mapper->SetInputData(geometry->GetOutput());
     mapper->ScalarVisibilityOff();
 
-    vtkSmartPointer<vtkActor> actor =
-      vtkSmartPointer<vtkActor>::New();
+    vtkNew<vtkActor> actor;
     actor->SetMapper(mapper);
 
     vtkColor3ub color = colorSeries->GetColor(i);
@@ -115,12 +105,10 @@ int main(int argc, char *argv[])
   iren->Initialize();
   iren->Start();
 
-  vtkSmartPointer<vtkGeometryFilter> geometry =
-    vtkSmartPointer<vtkGeometryFilter>::New();
+  vtkNew<vtkGeometryFilter> geometry;
   geometry->SetInputConnection(selector->GetOutputPort());
 
-  vtkSmartPointer<vtkXMLPolyDataWriter> writer =
-    vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+  vtkNew<vtkXMLPolyDataWriter> writer;
   writer->SetInputConnection(geometry->GetOutputPort());
   for (int i = 0; i < dicer->GetNumberOfActualPieces(); ++i)
   {
@@ -141,56 +129,49 @@ vtkSmartPointer<vtkPolyData> ReadPolyData(const char *fileName)
   std::string extension = vtksys::SystemTools::GetFilenameExtension(std::string(fileName));
   if (extension == ".ply")
   {
-    vtkSmartPointer<vtkPLYReader> reader =
-      vtkSmartPointer<vtkPLYReader>::New();
+    vtkNew<vtkPLYReader> reader;
     reader->SetFileName (fileName);
     reader->Update();
     polyData = reader->GetOutput();
   }
   else if (extension == ".vtp")
   {
-    vtkSmartPointer<vtkXMLPolyDataReader> reader =
-      vtkSmartPointer<vtkXMLPolyDataReader>::New();
+    vtkNew<vtkXMLPolyDataReader> reader;
     reader->SetFileName (fileName);
     reader->Update();
     polyData = reader->GetOutput();
   }
   else if (extension == ".obj")
   {
-    vtkSmartPointer<vtkOBJReader> reader =
-      vtkSmartPointer<vtkOBJReader>::New();
+    vtkNew<vtkOBJReader> reader;
     reader->SetFileName (fileName);
     reader->Update();
     polyData = reader->GetOutput();
   }
   else if (extension == ".stl")
   {
-    vtkSmartPointer<vtkSTLReader> reader =
-      vtkSmartPointer<vtkSTLReader>::New();
+    vtkNew<vtkSTLReader> reader;
     reader->SetFileName (fileName);
     reader->Update();
     polyData = reader->GetOutput();
   }
   else if (extension == ".vtk")
   {
-    vtkSmartPointer<vtkPolyDataReader> reader =
-      vtkSmartPointer<vtkPolyDataReader>::New();
+    vtkNew<vtkPolyDataReader> reader;
     reader->SetFileName (fileName);
     reader->Update();
     polyData = reader->GetOutput();
   }
   else if (extension == ".g")
   {
-    vtkSmartPointer<vtkBYUReader> reader =
-      vtkSmartPointer<vtkBYUReader>::New();
+    vtkNew<vtkBYUReader> reader;
     reader->SetGeometryFileName (fileName);
     reader->Update();
     polyData = reader->GetOutput();
   }
   else
   {
-    vtkSmartPointer<vtkSphereSource> source =
-      vtkSmartPointer<vtkSphereSource>::New();
+    vtkNew<vtkSphereSource> source;
     source->Update();
     polyData = source->GetOutput();
   }

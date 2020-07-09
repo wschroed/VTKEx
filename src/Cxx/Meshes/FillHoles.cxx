@@ -43,18 +43,15 @@ int main(int argc, char *argv[])
   vtkSmartPointer<vtkPolyData> input =
     ReadPolyData(argc > 1 ? argv[1] : "");
 
-  vtkSmartPointer<vtkNamedColors> colors =
-    vtkSmartPointer<vtkNamedColors>::New();
+  vtkNew<vtkNamedColors> colors;
 
-  vtkSmartPointer<vtkFillHolesFilter> fillHolesFilter =
-    vtkSmartPointer<vtkFillHolesFilter>::New();
+  vtkNew<vtkFillHolesFilter> fillHolesFilter;
   fillHolesFilter->SetInputData(input);
   fillHolesFilter->SetHoleSize(100000.0);
   fillHolesFilter->Update();
 
   // Make the triangle winding order consistent
-  vtkSmartPointer<vtkPolyDataNormals> normals =
-    vtkSmartPointer<vtkPolyDataNormals>::New();
+  vtkNew<vtkPolyDataNormals> normals;
   normals->SetInputData(fillHolesFilter->GetOutput());
   normals->ConsistencyOn();
   normals->SplittingOff();
@@ -72,50 +69,41 @@ int main(int argc, char *argv[])
   double rightViewport[4] = {0.5, 0.0, 1.0, 1.0};
 
   // Create a mapper and actor
-  vtkSmartPointer<vtkPolyDataMapper> originalMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> originalMapper;
   originalMapper->SetInputData(input);
 
-  vtkSmartPointer<vtkProperty> backfaceProp =
-    vtkSmartPointer<vtkProperty>::New();
+  vtkNew<vtkProperty> backfaceProp;
   backfaceProp->SetDiffuseColor(colors->GetColor3d("Banana").GetData());
 
-  vtkSmartPointer<vtkActor> originalActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> originalActor;
   originalActor->SetMapper(originalMapper);
   originalActor->SetBackfaceProperty(backfaceProp);
   originalActor->GetProperty()->SetDiffuseColor(
     colors->GetColor3d("Flesh").GetData());
 
-  vtkSmartPointer<vtkPolyDataMapper> filledMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> filledMapper;
   filledMapper->SetInputData(fillHolesFilter->GetOutput());
 
-  vtkSmartPointer<vtkActor> filledActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> filledActor;
   filledActor->SetMapper(filledMapper);
   filledActor->GetProperty()->SetDiffuseColor(
     colors->GetColor3d("Flesh").GetData());
   filledActor->SetBackfaceProperty(backfaceProp);
 
   // Create a renderer, render window, and interactor
-  vtkSmartPointer<vtkRenderer> leftRenderer =
-    vtkSmartPointer<vtkRenderer>::New();
+  vtkNew<vtkRenderer> leftRenderer;
   leftRenderer->SetViewport(leftViewport);
 
-  vtkSmartPointer<vtkRenderer> rightRenderer =
-    vtkSmartPointer<vtkRenderer>::New();
+  vtkNew<vtkRenderer> rightRenderer;
   rightRenderer->SetViewport(rightViewport);
 
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->SetSize(600,300);
 
   renderWindow->AddRenderer(leftRenderer);
   renderWindow->AddRenderer(rightRenderer);
 
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   // Add the actor to the scene
@@ -147,39 +135,33 @@ int main(int argc, char *argv[])
 void GenerateData(vtkPolyData* input)
 {
   // Create a sphere
-  vtkSmartPointer<vtkSphereSource> sphereSource =
-    vtkSmartPointer<vtkSphereSource>::New();
+  vtkNew<vtkSphereSource> sphereSource;
   sphereSource->Update();
 
   // Remove some cells
-  vtkSmartPointer<vtkIdTypeArray> ids =
-    vtkSmartPointer<vtkIdTypeArray>::New();
+  vtkNew<vtkIdTypeArray> ids;
   ids->SetNumberOfComponents(1);
 
   // Set values
   ids->InsertNextValue(2);
   ids->InsertNextValue(10);
 
-  vtkSmartPointer<vtkSelectionNode> selectionNode =
-    vtkSmartPointer<vtkSelectionNode>::New();
+  vtkNew<vtkSelectionNode> selectionNode;
   selectionNode->SetFieldType(vtkSelectionNode::CELL);
   selectionNode->SetContentType(vtkSelectionNode::INDICES);
   selectionNode->SetSelectionList(ids);
   selectionNode->GetProperties()->Set(vtkSelectionNode::INVERSE(), 1); //invert the selection
 
-  vtkSmartPointer<vtkSelection> selection =
-      vtkSmartPointer<vtkSelection>::New();
+  vtkNew<vtkSelection> selection;
   selection->AddNode(selectionNode);
 
-  vtkSmartPointer<vtkExtractSelection> extractSelection =
-      vtkSmartPointer<vtkExtractSelection>::New();
+  vtkNew<vtkExtractSelection> extractSelection;
   extractSelection->SetInputConnection(0, sphereSource->GetOutputPort());
   extractSelection->SetInputData(1, selection);
   extractSelection->Update();
 
   // In selection
-  vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter =
-    vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+  vtkNew<vtkDataSetSurfaceFilter> surfaceFilter;
   surfaceFilter->SetInputConnection(extractSelection->GetOutputPort());
   surfaceFilter->Update();
 
@@ -194,56 +176,49 @@ vtkSmartPointer<vtkPolyData> ReadPolyData(const char *fileName)
   std::string extension = vtksys::SystemTools::GetFilenameExtension(std::string(fileName));
   if (extension == ".ply")
   {
-    vtkSmartPointer<vtkPLYReader> reader =
-      vtkSmartPointer<vtkPLYReader>::New();
+    vtkNew<vtkPLYReader> reader;
     reader->SetFileName (fileName);
     reader->Update();
     polyData = reader->GetOutput();
   }
   else if (extension == ".vtp")
   {
-    vtkSmartPointer<vtkXMLPolyDataReader> reader =
-      vtkSmartPointer<vtkXMLPolyDataReader>::New();
+    vtkNew<vtkXMLPolyDataReader> reader;
     reader->SetFileName (fileName);
     reader->Update();
     polyData = reader->GetOutput();
   }
   else if (extension == ".obj")
   {
-    vtkSmartPointer<vtkOBJReader> reader =
-      vtkSmartPointer<vtkOBJReader>::New();
+    vtkNew<vtkOBJReader> reader;
     reader->SetFileName (fileName);
     reader->Update();
     polyData = reader->GetOutput();
   }
   else if (extension == ".stl")
   {
-    vtkSmartPointer<vtkSTLReader> reader =
-      vtkSmartPointer<vtkSTLReader>::New();
+    vtkNew<vtkSTLReader> reader;
     reader->SetFileName (fileName);
     reader->Update();
     polyData = reader->GetOutput();
   }
   else if (extension == ".vtk")
   {
-    vtkSmartPointer<vtkPolyDataReader> reader =
-      vtkSmartPointer<vtkPolyDataReader>::New();
+    vtkNew<vtkPolyDataReader> reader;
     reader->SetFileName (fileName);
     reader->Update();
     polyData = reader->GetOutput();
   }
   else if (extension == ".g")
   {
-    vtkSmartPointer<vtkBYUReader> reader =
-      vtkSmartPointer<vtkBYUReader>::New();
+    vtkNew<vtkBYUReader> reader;
     reader->SetGeometryFileName (fileName);
     reader->Update();
     polyData = reader->GetOutput();
   }
   else
   {
-    vtkSmartPointer<vtkSphereSource> source =
-      vtkSmartPointer<vtkSphereSource>::New();
+    vtkNew<vtkSphereSource> source;
     source->Update();
     polyData = source->GetOutput();
   }

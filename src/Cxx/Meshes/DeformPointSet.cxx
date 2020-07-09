@@ -18,23 +18,20 @@
 
 int main( int argc, char *argv[] )
 {
-  vtkSmartPointer<vtkPolyData> input =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> input;
   double bounds[6];
 
   if(argc == 1)
   {
     // Create a sphere to warp
-    vtkSmartPointer<vtkSphereSource> sphere =
-      vtkSmartPointer<vtkSphereSource>::New();
+    vtkNew<vtkSphereSource> sphere;
     sphere->SetThetaResolution(51);
     sphere->SetPhiResolution(17);
     sphere->Update();
     sphere->GetOutput()->GetBounds(bounds);
 
     // Generate some scalars on the polydata
-    vtkSmartPointer<vtkElevationFilter> ele =
-      vtkSmartPointer<vtkElevationFilter>::New();
+    vtkNew<vtkElevationFilter> ele;
     ele->SetInputConnection(sphere->GetOutputPort());
     ele->SetLowPoint(0,0,-0.5);
     ele->SetHighPoint(0,0,0.5);
@@ -52,8 +49,7 @@ int main( int argc, char *argv[] )
   {
     std::string inputFilename = argv[1];
 
-    vtkSmartPointer<vtkXMLPolyDataReader> reader =
-      vtkSmartPointer<vtkXMLPolyDataReader>::New();
+    vtkNew<vtkXMLPolyDataReader> reader;
     reader->SetFileName(inputFilename.c_str());
     reader->Update();
 
@@ -63,8 +59,7 @@ int main( int argc, char *argv[] )
 
   // Now create a control mesh, in this case a octagon that encloses
   // the point set
-  vtkSmartPointer<vtkPoints> pts =
-    vtkSmartPointer<vtkPoints>::New();
+  vtkNew<vtkPoints> pts;
   pts->SetNumberOfPoints(6);
   pts->SetPoint(0,
                 bounds[0] - .1 * (bounds[1] - bounds[0]),
@@ -91,8 +86,7 @@ int main( int argc, char *argv[] )
                 (bounds[3] + bounds[2]) / 2.0,
                 bounds[5] + .1 * (bounds[5] - bounds[4]));
 
-  vtkSmartPointer<vtkCellArray> tris =
-    vtkSmartPointer<vtkCellArray>::New();
+  vtkNew<vtkCellArray> tris;
   tris->InsertNextCell(3);
   tris->InsertCellPoint(2); tris->InsertCellPoint(0); tris->InsertCellPoint(4);
   tris->InsertNextCell(3);
@@ -110,27 +104,23 @@ int main( int argc, char *argv[] )
   tris->InsertNextCell(3);
   tris->InsertCellPoint(3); tris->InsertCellPoint(0); tris->InsertCellPoint(5);
 
-  vtkSmartPointer<vtkPolyData> pd =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> pd;
   pd->SetPoints(pts);
   pd->SetPolys(tris);
 
   // Display the control mesh
-  vtkSmartPointer<vtkPolyDataMapper> meshMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> meshMapper;
   meshMapper->SetInputData(pd);
-  vtkSmartPointer<vtkActor> meshActor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> meshActor;
   meshActor->SetMapper(meshMapper);
   meshActor->GetProperty()->SetRepresentationToWireframe();
   meshActor->GetProperty()->SetColor(0,0,0);
 
   // Do the intitial weight generation
-  vtkSmartPointer<vtkDeformPointSet> deform =
-    vtkSmartPointer<vtkDeformPointSet>::New();
-    deform->SetInputData(input);
-    deform->SetControlMeshData(pd);
-    deform->Update(); // this creates the initial weights
+  vtkNew<vtkDeformPointSet> deform;
+  deform->SetInputData(input);
+  deform->SetControlMeshData(pd);
+  deform->Update(); // this creates the initial weights
 
   // Now move one point and deform
   double controlPoint[3];
@@ -141,20 +131,15 @@ int main( int argc, char *argv[] )
   pts->Modified();
 
   // Display the warped polydata
-  vtkSmartPointer<vtkPolyDataMapper> polyMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
-    polyMapper->SetInputConnection(deform->GetOutputPort());
-  vtkSmartPointer<vtkActor> polyActor =
-    vtkSmartPointer<vtkActor>::New();
-    polyActor->SetMapper(polyMapper);
+  vtkNew<vtkPolyDataMapper> polyMapper;
+  polyMapper->SetInputConnection(deform->GetOutputPort());
+  vtkNew<vtkActor> polyActor;
+  polyActor->SetMapper(polyMapper);
 
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renWin =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer;
+  vtkNew<vtkRenderWindow> renWin;
   renWin->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> iren =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> iren;
   iren->SetRenderWindow(renWin);
 
   renderer->AddActor(polyActor);

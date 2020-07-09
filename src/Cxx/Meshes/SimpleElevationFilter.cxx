@@ -21,9 +21,8 @@
 int main(int, char *[])
 {
   // Created a grid of points (heigh/terrian map)
-  vtkSmartPointer<vtkPoints> points =
-    vtkSmartPointer<vtkPoints>::New();
-	
+  vtkNew<vtkPoints> points;
+
   unsigned int GridSize = 10;
   for(unsigned int x = 0; x < GridSize; x++)
   {
@@ -37,37 +36,31 @@ int main(int, char *[])
   points->GetBounds(bounds);
 
   // Add the grid points to a polydata object
-  vtkSmartPointer<vtkPolyData> inputPolyData =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> inputPolyData;
   inputPolyData->SetPoints(points);
-	
+
   // Triangulate the grid points
-  vtkSmartPointer<vtkDelaunay2D> delaunay =
-    vtkSmartPointer<vtkDelaunay2D>::New();
+  vtkNew<vtkDelaunay2D> delaunay;
   delaunay->SetInputData(inputPolyData);
   delaunay->Update();
 
-  vtkSmartPointer<vtkSimpleElevationFilter> elevationFilter =
-    vtkSmartPointer<vtkSimpleElevationFilter>::New();
+  vtkNew<vtkSimpleElevationFilter> elevationFilter;
   elevationFilter->SetInputConnection(delaunay->GetOutputPort());
   elevationFilter->SetVector(0.0, 0.0, 1);
   elevationFilter->Update();
 
-  vtkSmartPointer<vtkPolyData> output =
-    vtkSmartPointer<vtkPolyData>::New();
+  vtkNew<vtkPolyData> output;
   output->ShallowCopy(dynamic_cast<vtkPolyData*>(elevationFilter->GetOutput()));
 
   vtkFloatArray* elevation = dynamic_cast<vtkFloatArray*>(output->GetPointData()->GetArray("Elevation"));
 
   // Create the color map
-  vtkSmartPointer<vtkLookupTable> colorLookupTable =
-    vtkSmartPointer<vtkLookupTable>::New();
+  vtkNew<vtkLookupTable> colorLookupTable;
   colorLookupTable->SetTableRange(bounds[4], bounds[5]);
   colorLookupTable->Build();
 
   // Generate the colors for each point based on the color map
-  vtkSmartPointer<vtkUnsignedCharArray> colors =
-    vtkSmartPointer<vtkUnsignedCharArray>::New();
+  vtkNew<vtkUnsignedCharArray> colors;
   colors->SetNumberOfComponents(3);
   colors->SetName("Colors");
 
@@ -92,21 +85,16 @@ int main(int, char *[])
   output->GetPointData()->AddArray(colors);
 
   // Visualize
-  vtkSmartPointer<vtkPolyDataMapper> mapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkNew<vtkPolyDataMapper> mapper;
   mapper->SetInputData(output);
 
-  vtkSmartPointer<vtkActor> actor =
-    vtkSmartPointer<vtkActor>::New();
+  vtkNew<vtkActor> actor;
   actor->SetMapper(mapper);
 
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkNew<vtkRenderer> renderer;
+  vtkNew<vtkRenderWindow> renderWindow;
   renderWindow->AddRenderer(renderer);
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   renderer->AddActor(actor);
